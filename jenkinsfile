@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    environment {
+        ANSIBLE_CONFIG = "${WORKSPACE}/ansible/ansible.cfg"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/<your-username>/nginx-index-deploy.git'
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                sh '''
+                echo "Starting deployment..."
+                ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Deployment successful!"
+        }
+        failure {
+            echo "❌ Deployment failed!"
+        }
+    }
+}
+

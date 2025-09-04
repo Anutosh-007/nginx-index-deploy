@@ -1,0 +1,32 @@
+---
+- name: Deploy index.html to servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copy HTML file
+      copy:
+        src: "{{ item.src }}"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+      with_items:
+        - { src: "../index_aws.html" }
+      when: inventory_hostname == "aws-server"
+
+    - name: Copy HTML file
+      copy:
+        src: "{{ item.src }}"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+      with_items:
+        - { src: "../index_azure.html" }
+      when: inventory_hostname == "azure-server"
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
